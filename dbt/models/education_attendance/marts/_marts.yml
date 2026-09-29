@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: dim_school
+    columns:
+      - name: school_code
+        tests: [unique, not_null]
+
+  - name: fct_attendance_daily
+    description: One row per student per school day; only records that passed data-quality checks.
+    columns:
+      - name: attendance_key
+        tests: [unique, not_null]
+      - name: attendance_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['P', 'A', 'T']
+      - name: student_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_students')
+                field: student_id
+
+  - name: student_attendance_summary
+    columns:
+      - name: student_id
+        tests: [unique, not_null]
+      - name: attendance_rate
+        tests:
+          - between_0_and_1
+
+  - name: school_monthly_attendance
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['school_code', 'month_start']
+    columns:
+      - name: attendance_rate
+        tests: [not_null]
+
+  - name: attendance_data_quality
+    columns:
+      - name: dq_status
+        tests: [unique, not_null]

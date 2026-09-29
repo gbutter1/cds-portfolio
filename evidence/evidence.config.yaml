@@ -1,0 +1,32 @@
+# Open-source Evidence configuration (docs.evidence.dev).
+# Plugins: the component library and the Postgres source connector.
+# Theme colors are the validated Creative Data Solutions palette:
+# light  #1F6FB0 #D98A1E #1E9E8A #7B4FA8   dark  #4D94DA #C4842A #26A08C #A96CC8
+plugins:
+  components:
+    "@evidence-dev/core-components": {}
+  datasources:
+    "@evidence-dev/postgres": {}
+
+deployment:
+  # Set to "/<repo-name>" when hosting on GitHub Pages at user.github.io/<repo-name>.
+  # Leave as "" for a custom domain or any host that serves from the root.
+  basePath: ""
+
+appearance:
+  default: light
+  switcher: true
+
+theme:
+  colorPalettes:
+    default:
+      light: ["#1F6FB0", "#D98A1E", "#1E9E8A", "#7B4FA8"]
+      dark: ["#4D94DA", "#C4842A", "#26A08C", "#A96CC8"]
+  colorScales:
+    default:
+      light: ["#dbe9f7", "#154886"]
+      dark: ["#12263d", "#8fc0f0"]
+  colors:
+    primary:
+      light: "#1F6FB0"
+      dark: "#4D94DA"

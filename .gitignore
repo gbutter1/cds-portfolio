@@ -1,0 +1,28 @@
+# secrets
+.env
+
+# generated data (regenerate with projects/<project>/generate.py)
+data/raw/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+logs/
+
+# evidence
+evidence/node_modules/
+evidence/.evidence/
+evidence/build/
+evidence/static/data/
+
+# editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

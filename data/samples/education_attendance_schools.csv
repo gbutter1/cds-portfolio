@@ -1,0 +1,12 @@
+school_code,school_name,school_level,cluster,title_i
+ELM01,Riverbend Elementary,Elementary,North,True
+ELM02,Peachtree Grove Elementary,Elementary,North,False
+ELM03,Sugar Hill Elementary,Elementary,Central,True
+ELM04,Oak Hollow Elementary,Elementary,Central,False
+ELM05,Meadowlark Elementary,Elementary,South,True
+ELM06,Chattahoochee Elementary,Elementary,South,False
+MID01,Riverbend Middle,Middle,North,True
+MID02,Sugar Hill Middle,Middle,Central,False
+MID03,Meadowlark Middle,Middle,South,True
+HIG01,North Cluster High,High,North,False
+HIG02,South Cluster High,High,South,True

@@ -1,0 +1,17 @@
+# dbt reads the connection from the DATABASE_URL environment variable, the same
+# one the Python loader uses, so there is exactly one place credentials live.
+# (dbt-postgres has no native URL option, so the pieces are pulled out with
+# env_var + the parse_url macro-free approach below: we just ask for the parts.)
+cds_portfolio:
+  target: default
+  outputs:
+    default:
+      type: postgres
+      host: "{{ env_var('PGHOST') }}"
+      user: "{{ env_var('PGUSER') }}"
+      password: "{{ env_var('PGPASSWORD') }}"
+      port: "{{ env_var('PGPORT', '5432') | int }}"
+      dbname: "{{ env_var('PGDATABASE') }}"
+      schema: analytics
+      sslmode: "{{ env_var('PGSSLMODE', 'require') }}"
+      threads: 4

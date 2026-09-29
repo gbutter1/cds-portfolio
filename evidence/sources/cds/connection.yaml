@@ -1,0 +1,5 @@
+# Postgres source named "cds". Credentials are NOT stored here; they are read
+# from environment variables named EVIDENCE_SOURCE__cds__<option>, which
+# pipeline/run_evidence.py derives from DATABASE_URL.
+name: cds
+type: postgres

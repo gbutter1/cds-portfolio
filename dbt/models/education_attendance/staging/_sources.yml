@@ -1,0 +1,20 @@
+version: 2
+
+sources:
+  - name: raw_education_attendance
+    description: >
+      Raw CSV extracts from a (synthetic) student information system, loaded
+      as-is with every column as text. Nothing here is cleaned or typed.
+    schema: raw_education_attendance
+    tables:
+      - name: schools
+        description: One row per school site.
+      - name: students
+        description: Roster with enrollment and withdrawal dates. Some students transfer mid-year.
+      - name: calendar
+        description: Every calendar date in the school year, flagged as a school day or not.
+      - name: attendance_daily
+        description: >
+          One row per student per school day as delivered. Contains duplicate rows,
+          inconsistent school codes, invalid status codes, records on non-school days
+          and orphan student IDs. Staging handles all of it.

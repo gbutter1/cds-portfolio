@@ -1,0 +1,92 @@
+# Runs the full pipeline and publishes the Evidence site to GitHub Pages.
+#
+#   generate -> load raw -> dbt build (models + tests) -> evidence build -> deploy
+#
+# A failing dbt test stops the run before anything is published.
+#
+# One-time setup (see docs/getting-started-windows.md):
+#   1. Repository -> Settings -> Secrets and variables -> Actions -> New repository secret
+#      Name: DATABASE_URL   Value: your Neon connection string
+#   2. Repository -> Settings -> Pages -> Source: "GitHub Actions"
+
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 9 * * 1"   # Mondays 09:17 UTC (~5:17am Eastern): keeps the Neon project warm and the site fresh
+  workflow_dispatch:        # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: evidence/package-lock.json
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate source extracts
+        run: python projects/education_attendance/generate.py
+
+      - name: Load raw layer
+        run: python pipeline/load_raw.py education_attendance
+
+      - name: dbt build (models + tests)
+        run: python pipeline/run_dbt.py build --no-partial-parse
+
+      - name: Install Evidence
+        working-directory: evidence
+        run: npm ci
+
+      - name: Set site base path for GitHub Pages
+        # Served at https://<user>.github.io/<repo>/ so links need the repo name prefix.
+        # Skipped automatically if you later add a custom domain (see docs).
+        if: vars.CUSTOM_DOMAIN == ''
+        run: sed -i 's|^  basePath:.*|  basePath: "/${{ github.event.repository.name }}"|' evidence/evidence.config.yaml
+
+      - name: Evidence sources + build
+        run: |
+          python pipeline/run_evidence.py sources
+          python pipeline/run_evidence.py build
+
+      - name: Add custom domain file
+        if: vars.CUSTOM_DOMAIN != ''
+        run: echo "${{ vars.CUSTOM_DOMAIN }}" > evidence/build/CNAME
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: evidence/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
