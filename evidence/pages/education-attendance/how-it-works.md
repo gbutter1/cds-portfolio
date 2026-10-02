@@ -88,9 +88,9 @@ before anything is published.
 <Details title="Reproducing this locally">
 
 ```
-git clone <repo>
+git clone https://github.com/gbutter1/cds-portfolio.git
 pip install -r requirements.txt
-cp .env.example .env            # add your DATABASE_URL
+# create .env containing: DATABASE_URL=<your Postgres connection string>
 python projects/education_attendance/generate.py
 python pipeline/load_raw.py education_attendance
 python pipeline/run_dbt.py build

@@ -26,3 +26,6 @@ evidence/static/data/
 .idea/
 .DS_Store
 Thumbs.db
+docs/
+data/samples/
+.env.example

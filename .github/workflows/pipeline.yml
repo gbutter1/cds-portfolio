@@ -4,7 +4,7 @@
 #
 # A failing dbt test stops the run before anything is published.
 #
-# One-time setup (see docs/getting-started-windows.md):
+# One-time setup:
 #   1. Repository -> Settings -> Secrets and variables -> Actions -> New repository secret
 #      Name: DATABASE_URL   Value: your Neon connection string
 #   2. Repository -> Settings -> Pages -> Source: "GitHub Actions"

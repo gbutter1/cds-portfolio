@@ -5,7 +5,7 @@ on the same stack we use for clients. Every project here is fully open: the
 ingestion code, the data model, the validation rules and the dashboards all
 live in this repository.
 
-**Live site:** https://YOUR-GITHUB-USERNAME.github.io/cds-portfolio/
+**Live site:** https://gbutter1.github.io/cds-portfolio/
 **Company:** https://creativedatasolutions.tech
 
 ## Projects
@@ -46,21 +46,19 @@ anything is published.
 ```
 projects/<project>/     generate.py: builds that project's synthetic source extract
 pipeline/               load_raw.py, run_dbt.py, run_evidence.py (all read DATABASE_URL)
-dbt/                    models, tests, macros (see docs/how-dbt-works.md)
-evidence/               sources, pages, theme (see docs/how-evidence-works.md)
-data/samples/           small committed samples of each extract; full data is regenerated
-docs/                   getting started + one short explainer per tool
+dbt/                    models, tests, macros
+evidence/               sources, pages, theme
 .github/workflows/      the pipeline
 ```
 
 ## Run it yourself
 
-See [docs/getting-started-windows.md](docs/getting-started-windows.md) (Mac/Linux
-users: same commands with forward slashes). Short version:
+Requires Python 3.11+, Node.js 20+ and a Postgres database (a free Neon
+project works). Create a file named `.env` in the repository root containing
+one line, `DATABASE_URL=<your Postgres connection string>`, then:
 
 ```
 pip install -r requirements.txt
-copy .env.example .env                      # add your DATABASE_URL
 python projects/education_attendance/generate.py
 python pipeline/load_raw.py education_attendance
 python pipeline/run_dbt.py build
