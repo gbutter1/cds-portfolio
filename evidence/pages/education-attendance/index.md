@@ -94,7 +94,7 @@ select
     count(*)                                                     as students,
     count(*) filter (where s.is_chronically_absent)              as chronic_students,
     count(*) filter (where s.is_chronically_absent) / count(*)   as chronic_rate,
-    avg(s.attendance_rate)                                       as attendance_rate
+    sum(s.days_present) / sum(s.days_enrolled)                   as attendance_rate
 from cds.student_attendance_summary s
 join cds.dim_school d using (school_code)
 where d.school_level like '${inputs.level.value}'
@@ -109,21 +109,27 @@ order by chronic_rate desc
   x=school_name
   y=chronic_rate
   series=title_i
+  seriesColors={{'Title I': '#D98A1E', 'Non-Title I': '#1F6FB0'}}
   swapXY=true
   yFmt="pct1"
   title="Share of students chronically absent (≥10% of enrolled days)"
-  subtitle="Students enrolled fewer than 20 days are excluded"
+  subtitle="Bar color shows Title I status. Students enrolled fewer than 20 days are excluded."
   sort=false
 />
 
+**How to read these two numbers.** *Chronic rate* counts **students**: the
+share whose absences reached 10% or more of the days they were enrolled.
+*Attendance rate* counts **days**: all present and tardy days at the school
+divided by all enrolled days. A school can post 93% attendance and still have
+15% of its students chronically absent, because absences pile up on a small
+group of students. That gap is why districts track both.
+
 <DataTable data={by_school} rows=11 search=false>
   <Column id=school_name title="School" />
-  <Column id=school_level title="Level" />
-  <Column id=cluster />
   <Column id=title_i title="Title I" />
   <Column id=students fmt="#,##0" />
-  <Column id=chronic_students title="Chronic" fmt="#,##0" />
-  <Column id=chronic_rate title="Chronic rate" fmt="pct1" contentType=bar barColor="#1F6FB0" />
+  <Column id=chronic_students title="Chronic students" fmt="#,##0" />
+  <Column id=chronic_rate title="Chronic rate" fmt="pct1" />
   <Column id=attendance_rate title="Attendance rate" fmt="pct1" />
 </DataTable>
 
@@ -158,6 +164,7 @@ order by s.grade_order,
   subtitle="Tiers follow the common 5% / 10% / 20% thresholds"
   sort=false
   seriesOrder={['Satisfactory (<5%)', 'At risk (5-10%)', 'Chronic (10-20%)', 'Severe (20%+)']}
+  seriesColors={{'Satisfactory (<5%)': '#d9dde3', 'At risk (5-10%)': '#e9a99d', 'Chronic (10-20%)': '#c8553f', 'Severe (20%+)': '#7f2415'}}
 />
 
 ## Day-of-week pattern
@@ -193,6 +200,8 @@ pattern behind "Friday attendance" interventions.
 - **Attendance rate**: (present + tardy student-days) ÷ enrolled student-days. Tardy counts as present, matching most state reporting rules.
 - **Chronically absent**: absent on 10% or more of enrolled school days, for students enrolled at least 20 days.
 - **Enrolled student-day**: a school day between the student's enrollment date and withdrawal date (inclusive).
-- Only rows that passed every data-quality check are counted. See the [data quality report](/education-attendance/data-quality).
+- Only rows that passed every data-quality check are counted; the data quality report lists everything that was rejected and why.
+
+<LinkButton url="/education-attendance/data-quality">Data quality report</LinkButton>
 
 </Details>

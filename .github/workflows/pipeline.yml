@@ -66,7 +66,9 @@ jobs:
         # Served at https://<user>.github.io/<repo>/ so links need the repo name prefix.
         # Skipped automatically if you later add a custom domain (see docs).
         if: vars.CUSTOM_DOMAIN == ''
-        run: sed -i 's|^  basePath:.*|  basePath: "/${{ github.event.repository.name }}"|' evidence/evidence.config.yaml
+        run: |
+          sed -i 's|^  basePath:.*|  basePath: "/${{ github.event.repository.name }}"|' evidence/evidence.config.yaml
+          grep basePath evidence/evidence.config.yaml
 
       - name: Evidence sources + build
         run: |

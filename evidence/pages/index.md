@@ -41,9 +41,9 @@ definition. The source data is synthetic and messy on purpose: duplicates,
 bad status codes, holiday-dated rows, orphan IDs and post-withdrawal records
 are all present and all caught.
 
-[Open the attendance dashboard →](/education-attendance)
-&nbsp;·&nbsp; [Data quality report](/education-attendance/data-quality)
-&nbsp;·&nbsp; [How it was built](/education-attendance/how-it-works)
+<LinkButton url="/education-attendance">Open the attendance dashboard →</LinkButton>
+<LinkButton url="/education-attendance/data-quality">Data quality report</LinkButton>
+<LinkButton url="/education-attendance/how-it-works">How it was built</LinkButton>
 
 *More projects (small-business KPIs, nonprofit program outcomes, healthcare
 operations) are added to this same repository as they are completed.*
