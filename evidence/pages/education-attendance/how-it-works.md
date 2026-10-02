@@ -85,18 +85,5 @@ change: generate → load → `dbt build` (models and tests together, in
 dependency order) → Evidence build → publish. A failed test stops the run
 before anything is published.
 
-<Details title="Reproducing this locally">
-
-```
-git clone https://github.com/gbutter1/cds-portfolio.git
-pip install -r requirements.txt
-# create .env containing: DATABASE_URL=<your Postgres connection string>
-python projects/education_attendance/generate.py
-python pipeline/load_raw.py education_attendance
-python pipeline/run_dbt.py build
-cd evidence && npm install && cd ..
-python pipeline/run_evidence.py sources
-python pipeline/run_evidence.py dev
-```
-
-</Details>
+The full source code, and the commands to run the whole pipeline yourself,
+are in the [public repository on GitHub](https://github.com/gbutter1/cds-portfolio).
