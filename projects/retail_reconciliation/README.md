@@ -1,4 +1,4 @@
-# Multi-System Reconciliation
+# Store-to-Bank Reconciliation
 
 **Sector:** Retail / finance operations
 **Question answered:** Do a retailer's five systems agree with each other, and

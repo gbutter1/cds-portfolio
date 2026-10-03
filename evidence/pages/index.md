@@ -58,7 +58,7 @@ counted.
 <LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis & Flu Explorer →</LinkButton>
 <LinkButton url="/healthcare-diagnosis/how-it-works">How it was built</LinkButton>
 
-### Multi-System Reconciliation (weekly report)
+### Store-to-Bank Reconciliation (weekly report)
 
 A data integration project: a fictional warehouse club with three stores,
 each running a retail floor, a café and an auto center, and five systems that

@@ -1,5 +1,5 @@
 ---
-title: How It Was Built · Multi-System Reconciliation
+title: How It Was Built · Store-to-Bank Reconciliation
 ---
 
 This project is about **data integration**: taking five systems that

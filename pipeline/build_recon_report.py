@@ -134,7 +134,7 @@ TEMPLATE = r"""{% macro ex_table(list) %}
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Weekly Reconciliation · {{ label }} · Creative Data Solutions</title>
+<title>Store-to-Bank Reconciliation · Week of {{ label }} · Creative Data Solutions</title>
 <meta name="description" content="Weekly reconciliation report for a three-department retailer: sales, accounting, bank and inventory matched across five systems.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -175,6 +175,7 @@ TEMPLATE = r"""{% macro ex_table(list) %}
   .rhead { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-bottom: 2px solid var(--accent-cool); padding-bottom: 16px; }
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--value); margin: 0 0 6px; }
   h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 30px; line-height: 1.15; margin: 0; color: var(--accent-cool); }
+  .rhead .wk { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 19px; color: var(--value); margin: 6px 0 0; }
   .rhead .meta { font-size: 12.5px; color: var(--text-lo); text-align: right; line-height: 1.6; }
   @media (max-width: 640px) { h1 { font-size: 24px; } .rhead .meta { text-align: left; } }
 
@@ -286,8 +287,9 @@ TEMPLATE = r"""{% macro ex_table(list) %}
   <article class="paper">
     <div class="rhead">
       <div>
-        <p class="eyebrow">Peachtree Supply Club · Weekly reconciliation</p>
-        <h1>Week of {{ label }}</h1>
+        <p class="eyebrow">Peachtree Supply Club · Weekly report</p>
+        <h1>Store-to-Bank Reconciliation</h1>
+        <p class="wk">Week of {{ label }}</p>
       </div>
       <div class="meta">
         3 stores · Retail, Café, Auto Center<br>
