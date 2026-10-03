@@ -1,0 +1,83 @@
+version: 2
+
+# Every source system's own store code must map to a store in the crosswalk,
+# and every product/part key must be unique, or the reconciliation can't be trusted.
+models:
+  - name: stg_rr_products
+    columns:
+      - name: sku
+        tests: [unique, not_null]
+
+  - name: stg_rr_price_book
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['sku', 'effective_from']
+
+  - name: stg_rr_part_xref
+    columns:
+      - name: part_key
+        tests: [unique, not_null]
+
+  - name: stg_rr_retail_pos_lines
+    columns:
+      - name: store_id
+        tests: [not_null]
+      - name: tender_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['CARD', 'CASH']
+
+  - name: stg_rr_cafe_sales
+    columns:
+      - name: store_id
+        tests: [not_null]
+      - name: food_cost_pct
+        tests: [not_null]
+
+  - name: stg_rr_cafe_tenders
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['store_id', 'business_date', 'shift']
+    columns:
+      - name: store_id
+        tests: [not_null]
+
+  - name: stg_rr_auto_lines
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['wo_number', 'line_no']
+    columns:
+      - name: store_id
+        tests: [not_null]
+      - name: closed_at
+        tests: [not_null]
+      - name: line_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['PART', 'LABOR', 'FEE']
+
+  - name: stg_rr_inventory_movements
+    columns:
+      - name: store_id
+        tests: [not_null]
+
+  - name: stg_rr_gl_journal
+    columns:
+      - name: store_id
+        tests: [not_null]
+      - name: account
+        tests:
+          - relationships:
+              arguments:
+                to: ref('rr_gl_accounts')
+                field: account
+
+  - name: stg_rr_bank_transactions
+    columns:
+      - name: bank_line_id
+        tests: [unique, not_null]

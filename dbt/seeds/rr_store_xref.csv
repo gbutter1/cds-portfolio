@@ -1,0 +1,4 @@
+store_id,store_name,city,retail_store_no,cafe_location,auto_shop_code,gl_entity,card_merchant_id,cafe_merchant_id,sales_tax_rate
+S101,Peachtree Supply Club - Duluth,Duluth,101,cafe-dul,DUL1,1101,884100101,CB-7701,0.07
+S102,Peachtree Supply Club - Kennesaw,Kennesaw,102,cafe-ken,KEN1,1102,884100102,CB-7702,0.07
+S103,Peachtree Supply Club - McDonough,McDonough,103,cafe-mcd,MCD1,1103,884100103,CB-7703,0.07

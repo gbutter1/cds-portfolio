@@ -58,6 +58,20 @@ counted.
 <LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis & Flu Explorer →</LinkButton>
 <LinkButton url="/healthcare-diagnosis/how-it-works">How it was built</LinkButton>
 
+### Multi-System Reconciliation (weekly report)
+
+A data integration project: a fictional warehouse club with three stores,
+each running a retail floor, a café and an auto center, and five systems that
+were never designed to agree (two point-of-sale systems, an auto shop system,
+inventory, accounting and the bank). The pipeline translates them into one
+shared language and runs five reconciliation checks, from register sales vs.
+the books to tires installed vs. tires taken out of inventory. The result is
+a **printable weekly report** listing every mismatch, the dollars at risk, the
+system where the fix belongs and the next step. 26 weeks, ~435,000 records.
+
+<LinkButton url="/reports/retail-reconciliation/index.html">Open the latest weekly report →</LinkButton>
+<LinkButton url="/retail-reconciliation/how-it-works">How it was built</LinkButton>
+
 *More projects are added to this same repository as they are completed.*
 
 ## The stack

@@ -1,0 +1,4 @@
+processor,description,departments,contract_fee_rate,usual_lag_business_days
+PEACHPAY,Card processor for retail registers and the auto center,Retail + Auto Center,0.0185,1
+TABLESIDE,Card processor for the cafe,Café,0.026,2
+ARMORED,Armored-car cash pickup (all departments),All,0,1

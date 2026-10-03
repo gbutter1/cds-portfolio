@@ -1,0 +1,122 @@
+version: 2
+
+models:
+  - name: rr_dim_store
+    columns:
+      - name: store_id
+        tests: [unique, not_null]
+
+  - name: rr_daily_department_sales
+    description: Net sales and cost per store, business date and department, from the three point-of-sale systems.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['store_id', 'business_date', 'department']
+    columns:
+      - name: store_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('rr_dim_store')
+                field: store_id
+
+  - name: rr_recon_sales_vs_gl
+    description: Check 1. Point-of-sale totals vs revenue booked in accounting, per store, day and department.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['store_id', 'business_date', 'department']
+    columns:
+      - name: match_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['matched', 'timing', 'wrong_store', 'wrong_department', 'unexplained']
+
+  - name: rr_recon_card_vs_bank
+    description: Check 2. Card batches vs bank settlements, per processor, store and batch date.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['processor', 'store_id', 'batch_date']
+    columns:
+      - name: match_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['matched', 'late', 'missing', 'fee_above_contract', 'short', 'over', 'unexpected_deposit']
+
+  - name: rr_recon_cash_vs_bank
+    description: Check 3. Cash recorded by all departments vs armored-car deposits, per store and day.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['store_id', 'business_date']
+    columns:
+      - name: match_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['matched', 'short', 'over', 'missing', 'unexpected_deposit']
+
+  - name: rr_recon_auto_parts_vs_inventory
+    description: Check 4. Parts billed on auto center work orders vs parts issued from store inventory.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['wo_number', 'line_no']
+    columns:
+      - name: match_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['matched', 'unmapped_part', 'not_issued', 'qty_mismatch']
+
+  - name: rr_recon_product_master
+    description: Check 5. Register sales vs the product master and price book, per store, SKU and week.
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['store_id', 'sku', 'week_start']
+    columns:
+      - name: match_status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['matched', 'not_in_master', 'price_mismatch']
+
+  - name: rr_exceptions
+    description: Every reconciliation problem, one row each, with a plain-language explanation and next step.
+    columns:
+      - name: exception_id
+        tests: [unique, not_null]
+      - name: store_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('rr_dim_store')
+                field: store_id
+      - name: severity
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['High', 'Medium', 'Low']
+
+  - name: rr_check_summary
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['check_name', 'week_start']
+    columns:
+      - name: match_rate
+        tests: [between_0_and_1]
+
+  - name: rr_weekly_scorecard
+    tests:
+      - unique_combination:
+          arguments:
+            columns: ['week_start', 'store_id', 'department']
+    columns:
+      - name: gross_margin_pct
+        tests: [between_0_and_1]

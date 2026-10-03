@@ -11,3 +11,32 @@ seeds:
         tests: [unique, not_null]
       - name: category
         tests: [not_null]
+
+  - name: rr_store_xref
+    description: >
+      Store crosswalk for the retail project. Every system identifies a store
+      differently (retail store number, cafe location code, auto shop code,
+      accounting entity, card merchant IDs); this table ties them to one store_id.
+    columns:
+      - name: store_id
+        tests: [unique, not_null]
+      - name: retail_store_no
+        tests: [unique, not_null]
+      - name: cafe_location
+        tests: [unique, not_null]
+      - name: auto_shop_code
+        tests: [unique, not_null]
+      - name: gl_entity
+        tests: [unique, not_null]
+
+  - name: rr_gl_accounts
+    description: Chart of accounts used by the stores, with the department each revenue account belongs to.
+    columns:
+      - name: account
+        tests: [unique, not_null]
+
+  - name: rr_processors
+    description: Card processors and the armored-car service, with contract fee rates.
+    columns:
+      - name: processor
+        tests: [unique, not_null]

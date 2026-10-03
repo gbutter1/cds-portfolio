@@ -27,6 +27,13 @@ models:
       marts:
         +schema: marts
         +materialized: table
+    retail_reconciliation:
+      staging:
+        +schema: staging
+        +materialized: view
+      marts:
+        +schema: marts
+        +materialized: table
 
 seeds:
   cds_portfolio:
@@ -37,3 +44,21 @@ seeds:
         description: text
         category: text
         is_influenza: boolean
+    rr_store_xref:
+      +column_types:
+        store_id: text
+        retail_store_no: text
+        auto_shop_code: text
+        gl_entity: text
+        card_merchant_id: text
+        cafe_merchant_id: text
+        sales_tax_rate: numeric
+    rr_gl_accounts:
+      +column_types:
+        account: text
+        department: text
+        is_revenue: boolean
+    rr_processors:
+      +column_types:
+        contract_fee_rate: numeric
+        usual_lag_business_days: integer

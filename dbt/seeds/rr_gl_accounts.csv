@@ -1,0 +1,8 @@
+account,account_name,department,is_revenue
+4010,Merchandise sales,Retail,true
+4020,Food service sales,Café,true
+4030,Auto service - parts & fees,Auto Center,true
+4031,Auto service - labor,Auto Center,true
+2100,Sales tax payable,,false
+1210,Card clearing,,false
+1010,Cash on hand,,false

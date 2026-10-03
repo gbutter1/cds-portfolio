@@ -82,7 +82,7 @@ alert weeks per season, in line with a typical real season.
 
 ## 5. Tests
 
-Over 40 tests run on this project alone: unique and not-null keys,
+29 tests run on this project alone: unique and not-null keys,
 relationships from every visit to a valid facility and a valid ICD-10 code,
 accepted values on every status, unique grains on every rollup (including a
 check that each facility-month has exactly one diagnosis at each rank),

@@ -21,6 +21,7 @@ evidence/.evidence/
 evidence/build/
 evidence/static/data/
 evidence/static/apps/diagnosis-explorer/data.json
+evidence/static/reports/
 
 # editors / OS
 .vscode/

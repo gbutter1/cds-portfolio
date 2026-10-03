@@ -1,0 +1,31 @@
+version: 2
+
+sources:
+  - name: raw_retail_reconciliation
+    description: >
+      Raw extracts from the five systems behind the (fictional) Peachtree Supply
+      Club stores, loaded as-is with every column as text. Each system uses its
+      own store codes, product codes, date formats and amount formats.
+    schema: raw_retail_reconciliation
+    tables:
+      - name: retail_pos_lines
+        description: Retail register transactions, one row per item line.
+      - name: products
+        description: Merchandising product master (SKU, description, category, cost).
+      - name: price_book
+        description: Price history from merchandising; each row is a price effective from a date.
+      - name: cafe_menu
+      - name: cafe_shift_sales
+        description: Cafe point of sale, items sold per shift.
+      - name: cafe_shift_tenders
+        description: Cafe card and cash totals per shift, with the date the card batch was actually closed.
+      - name: auto_work_order_lines
+        description: Auto center work orders, one row per labor, part or fee line.
+      - name: auto_part_xref
+        description: Auto center crosswalk from vendor part numbers to store SKUs.
+      - name: inventory_movements
+        description: Inventory system movements (sales, receipts, auto center issues).
+      - name: gl_journal
+        description: Accounting journal lines, daily summaries posted by each source system.
+      - name: bank_transactions
+        description: Operating account bank statement credits.
