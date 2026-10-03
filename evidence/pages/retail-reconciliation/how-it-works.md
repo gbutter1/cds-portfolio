@@ -2,7 +2,7 @@
 title: How It Was Built · Store-to-Bank Reconciliation
 ---
 
-This project is about **data integration**: taking five systems that
+This project is about **data integration**: taking six systems that
 were never designed to talk to each other, translating them into one shared
 language, and proving they agree. The output is the report a controller or
 store operations lead would want on their desk every Monday: what doesn't
@@ -21,13 +21,13 @@ installs tires, batteries and oil changes. The data covers 26 weeks, from
 March 30 to September 27, 2026: about 435,000 records and $16.6 million in
 sales.
 
-## 2. Five systems, five dialects
+## 2. Six systems, six dialects
 
 ```sql systems
 select 'Retail registers' as system, 'One row per item scanned' as grain, 'Store "101", 8-digit SKUs with leading zeros, ISO timestamps' as how_it_speaks
 union all select 'Café registers', 'Items sold and card/cash totals per shift', 'Location "cafe-dul" (sometimes upper case), MM/DD/YYYY dates, its own menu codes'
 union all select 'Auto center shop system', 'One row per labor, part or fee line on a work order', 'Shop "DUL1", the tire vendor''s part numbers, "$1,234.50" amounts, "4/12/2026 3:42 PM" times'
-union all select 'Inventory', 'Sales, receipts and auto center issues', 'SKUs without leading zeros, work orders as references'
+union all select 'Merchandising & inventory', 'Product master, price history, and stock movements (sales, receipts, auto center issues)', 'SKUs with leading zeros in the product master but without them in inventory, work orders as references'
 union all select 'Accounting', 'Daily journal lines by account', 'Entity "1101", YYYYMMDD dates, debit and credit columns, GL account numbers'
 union all select 'Bank statement', 'One line per deposit', 'Everything (processor, merchant ID, batch date) packed into a free-text description'
 ```
@@ -87,7 +87,7 @@ kind of gap that otherwise only surfaces at the annual physical count.
 All five checks feed a single `rr_exceptions` table, one row per problem,
 with the amount at risk, a severity, the system where the fix belongs and a
 plain-language next step, so the report can be read by someone who has never
-opened any of the five systems. Timing differences are kept but not counted as
+opened any of the six systems. Timing differences are kept but not counted as
 unmatched dollars.
 
 ```sql models

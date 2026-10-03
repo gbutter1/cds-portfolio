@@ -1,5 +1,5 @@
 -- Every reconciliation problem in one list, one row per problem, written so a store manager or
--- accountant can act on it without opening five systems: what doesn't match, by how much, which
+-- accountant can act on it without opening six systems: what doesn't match, by how much, which
 -- system is most likely wrong, and what to do about it.
 -- is_timing marks items that clear on their own (posted a day late, deposit arrived late); they are
 -- reported but not counted as unmatched dollars.

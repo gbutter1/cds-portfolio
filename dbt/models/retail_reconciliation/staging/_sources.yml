@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: raw_retail_reconciliation
     description: >
-      Raw extracts from the five systems behind the (fictional) Peachtree Supply
+      Raw extracts from the six systems behind the (fictional) Peachtree Supply
       Club stores, loaded as-is with every column as text. Each system uses its
       own store codes, product codes, date formats and amount formats.
     schema: raw_retail_reconciliation

@@ -61,9 +61,9 @@ counted.
 ### Store-to-Bank Reconciliation (weekly report)
 
 A data integration project: a fictional warehouse club with three stores,
-each running a retail floor, a café and an auto center, and five systems that
+each running a retail floor, a café and an auto center, and six systems that
 were never designed to agree (two point-of-sale systems, an auto shop system,
-inventory, accounting and the bank). The pipeline translates them into one
+merchandising and inventory, accounting, and the bank). The pipeline translates them into one
 shared language and runs five reconciliation checks, from register sales vs.
 the books to tires installed vs. tires taken out of inventory. The result is
 a **printable weekly report** listing every mismatch, the dollars at risk, the

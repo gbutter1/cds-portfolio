@@ -14,7 +14,7 @@ live in this repository.
 |---|---|---|
 | [K-12 Daily Attendance & Chronic Absenteeism](projects/education_attendance/) | Education | Messy daily-attendance extract → validated student/school/month models → attendance and chronic-absenteeism dashboards, with a data-quality report of every rejected row |
 | [Diagnosis & Flu Explorer](projects/healthcare_diagnosis/) ([open the app](https://gbutter1.github.io/cds-portfolio/apps/diagnosis-explorer/)) | Healthcare | Interactive app: pick a facility, month and age group to see its top diagnosis codes and flu-season trend, compared with real CDC flu surveillance data for Georgia |
-| [Store-to-Bank Reconciliation](projects/retail_reconciliation/) ([open the report](https://gbutter1.github.io/cds-portfolio/reports/retail-reconciliation/)) | Retail / Finance | Data integration: five systems for a three-department retailer (retail, café, auto center) reconciled into a printable weekly exceptions report |
+| [Store-to-Bank Reconciliation](projects/retail_reconciliation/) ([open the report](https://gbutter1.github.io/cds-portfolio/reports/retail-reconciliation/)) | Retail / Finance | Data integration: six systems for a three-department retailer (retail, café, auto center) reconciled into a printable weekly exceptions report |
 
 More projects are added here as they are completed. Each follows the same shape.
 

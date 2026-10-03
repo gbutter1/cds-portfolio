@@ -1,5 +1,5 @@
 """
-Synthetic extracts from the five systems behind a fictional warehouse club,
+Synthetic extracts from the six systems behind a fictional warehouse club,
 Peachtree Supply Club: three Atlanta-area stores, each with a retail floor, a
 cafe and an auto center. 26 weeks, Monday 30 March to Sunday 27 September 2026.
 

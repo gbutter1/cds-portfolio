@@ -135,7 +135,7 @@ TEMPLATE = r"""{% macro ex_table(list) %}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Store-to-Bank Reconciliation · Week of {{ label }} · Creative Data Solutions</title>
-<meta name="description" content="Weekly reconciliation report for a three-department retailer: sales, accounting, bank and inventory matched across five systems.">
+<meta name="description" content="Weekly reconciliation report for a three-department retailer: sales, accounting, bank and inventory matched across six systems.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
 <style>
@@ -293,7 +293,7 @@ TEMPLATE = r"""{% macro ex_table(list) %}
       </div>
       <div class="meta">
         3 stores · Retail, Café, Auto Center<br>
-        5 systems reconciled · prepared {{ prepared }}
+        6 systems reconciled · prepared {{ prepared }}
       </div>
     </div>
 
@@ -371,7 +371,7 @@ TEMPLATE = r"""{% macro ex_table(list) %}
     </section>
 
     <div class="foot">
-      Peachtree Supply Club is a fictional company. Its five systems (retail registers, café registers, auto center, accounting and bank)
+      Peachtree Supply Club is a fictional company. Its six systems (retail registers, café registers, auto center, merchandising and inventory, accounting, and bank)
       are realistic sample data with deliberate, real-world mismatches built in, so no real business or customer data is used.
       The report is rebuilt automatically whenever the pipeline runs and is published only if every data test passes.
     </div>
@@ -451,13 +451,13 @@ def main() -> int:
 
         # plain-language summary
         if not open_ex:
-            text = f"Every item matched across all five systems for the week of {week_label(w)}."
+            text = f"Every item matched across all six systems for the week of {week_label(w)}."
         else:
             worst = defaultdict(float)
             for e in open_ex:
                 worst[e["check_name"]] += e["amount"]
             top_check = max(worst, key=worst.get)
-            text = (f"{matched / items:.1%} of {items:,} items matched across the five systems. "
+            text = (f"{matched / items:.1%} of {items:,} items matched across the six systems. "
                     f"{len(open_ex)} item{'s' if len(open_ex) != 1 else ''} worth {money(t['open_amount'])} need attention"
                     f"{f', {len(high)} of them high severity' if high else ''}. "
                     f"The largest share is in {top_check.lower()} ({money(worst[top_check])}).")
