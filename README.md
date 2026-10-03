@@ -13,9 +13,9 @@ live in this repository.
 | Project | Sector | What it shows |
 |---|---|---|
 | [K-12 Daily Attendance & Chronic Absenteeism](projects/education_attendance/) | Education | Messy daily-attendance extract → validated student/school/month models → attendance and chronic-absenteeism dashboards, with a data-quality report of every rejected row |
+| [Diagnosis Explorer](projects/healthcare_diagnosis/) ([open the app](https://gbutter1.github.io/cds-portfolio/apps/diagnosis-explorer/)) | Healthcare | Interactive app: pick a facility, month and age group to see its top diagnosis codes and flu-season trend, compared with real CDC flu surveillance data for Georgia |
 
-More projects (small-business KPIs, nonprofit program outcomes, healthcare
-operations) are added here as they are completed. Each follows the same shape.
+More projects are added here as they are completed. Each follows the same shape.
 
 ## How every project is built
 
@@ -27,8 +27,8 @@ operations) are added here as they are completed. Each follows the same shape.
                        pipeline/load_raw.py dbt staging/          dbt marts/            evidence/pages/
 ```
 
-Orchestrated by GitHub Actions: generate → load → `dbt build` (models + 36
-tests) → Evidence build → GitHub Pages. A failing test stops the run before
+Orchestrated by GitHub Actions: generate (and fetch public data) → load →
+`dbt build` (seeds, models and tests) → Evidence build → GitHub Pages. A failing test stops the run before
 anything is published.
 
 ## Stack
@@ -60,8 +60,12 @@ one line, `DATABASE_URL=<your Postgres connection string>`, then:
 ```
 pip install -r requirements.txt
 python projects/education_attendance/generate.py
+python projects/healthcare_diagnosis/generate.py
+python projects/healthcare_diagnosis/fetch_cdc_flu.py
 python pipeline/load_raw.py education_attendance
+python pipeline/load_raw.py healthcare_diagnosis
 python pipeline/run_dbt.py build
+python pipeline/export_app_data.py
 cd evidence && npm install && cd ..
 python pipeline/run_evidence.py sources
 python pipeline/run_evidence.py dev
@@ -72,3 +76,6 @@ python pipeline/run_evidence.py dev
 No client, student or patient data appears anywhere in this repository.
 Datasets are generated from a fixed random seed with realistic structure,
 seasonality and error patterns so the engineering can be shown in full.
+The one exception is the CDC flu comparison in the Diagnosis Explorer, which
+uses real, public CDC ILINet surveillance data for Georgia (state-level
+weekly totals, no individual records).

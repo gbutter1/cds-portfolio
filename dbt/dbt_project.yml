@@ -20,3 +20,20 @@ models:
       marts:
         +schema: marts
         +materialized: table
+    healthcare_diagnosis:
+      staging:
+        +schema: staging
+        +materialized: view
+      marts:
+        +schema: marts
+        +materialized: table
+
+seeds:
+  cds_portfolio:
+    +schema: reference
+    icd10_reference:
+      +column_types:
+        icd10_code: text
+        description: text
+        category: text
+        is_influenza: boolean

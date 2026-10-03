@@ -1,0 +1,13 @@
+version: 2
+
+seeds:
+  - name: icd10_reference
+    description: >
+      ICD-10-CM codes used in the healthcare project, with official short
+      descriptions and a reporting category. Influenza codes (J09-J11 family)
+      are flagged for the flu views.
+    columns:
+      - name: icd10_code
+        tests: [unique, not_null]
+      - name: category
+        tests: [not_null]

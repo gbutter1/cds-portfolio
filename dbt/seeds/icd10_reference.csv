@@ -1,0 +1,36 @@
+icd10_code,description,category,is_influenza
+J10.1,Influenza due to other identified influenza virus with other respiratory manifestations,Respiratory,true
+J11.1,Influenza due to unidentified influenza virus with other respiratory manifestations,Respiratory,true
+J06.9,"Acute upper respiratory infection, unspecified",Respiratory,false
+J02.9,"Acute pharyngitis, unspecified",Respiratory,false
+J20.9,"Acute bronchitis, unspecified",Respiratory,false
+J01.90,"Acute sinusitis, unspecified",Respiratory,false
+J18.9,"Pneumonia, unspecified organism",Respiratory,false
+J45.909,"Unspecified asthma, uncomplicated",Respiratory,false
+J30.9,"Allergic rhinitis, unspecified",Respiratory,false
+U07.1,COVID-19,Respiratory,false
+R05.9,"Cough, unspecified",Symptoms,false
+R50.9,"Fever, unspecified",Symptoms,false
+R51.9,"Headache, unspecified",Symptoms,false
+R07.9,"Chest pain, unspecified",Symptoms,false
+R10.9,Unspecified abdominal pain,Symptoms,false
+B34.9,"Viral infection, unspecified",Infectious,false
+A08.4,"Viral intestinal infection, unspecified",Infectious,false
+H66.90,"Otitis media, unspecified, unspecified ear",Infectious,false
+L03.90,"Cellulitis, unspecified",Infectious,false
+N39.0,"Urinary tract infection, site not specified",Infectious,false
+I10,Essential (primary) hypertension,Chronic conditions,false
+E11.9,Type 2 diabetes mellitus without complications,Chronic conditions,false
+E78.5,"Hyperlipidemia, unspecified",Chronic conditions,false
+E66.9,"Obesity, unspecified",Chronic conditions,false
+K21.9,Gastro-esophageal reflux disease without esophagitis,Chronic conditions,false
+G43.909,"Migraine, unspecified, not intractable, without status migrainosus",Chronic conditions,false
+F41.1,Generalized anxiety disorder,Behavioral health,false
+F32.A,"Depression, unspecified",Behavioral health,false
+M54.50,"Low back pain, unspecified",Musculoskeletal & injury,false
+M25.561,Pain in right knee,Musculoskeletal & injury,false
+S93.401A,"Sprain of unspecified ligament of right ankle, initial encounter",Musculoskeletal & injury,false
+S01.81XA,"Laceration without foreign body of other part of head, initial encounter",Musculoskeletal & injury,false
+Z00.00,Encounter for general adult medical examination without abnormal findings,Preventive,false
+Z00.129,Encounter for routine child health examination without abnormal findings,Preventive,false
+Z23,Encounter for immunization,Preventive,false

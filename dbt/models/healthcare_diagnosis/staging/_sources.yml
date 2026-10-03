@@ -1,0 +1,15 @@
+version: 2
+
+sources:
+  - name: raw_healthcare_diagnosis
+    description: >
+      Raw extracts for the healthcare diagnosis project, loaded as-is with every
+      column as text: a (synthetic) EHR encounter extract and facility list, plus
+      real CDC ILINet weekly flu-like-illness data for Georgia.
+    schema: raw_healthcare_diagnosis
+    tables:
+      - name: facilities
+      - name: encounters
+        description: One row per visit as delivered, with formatting problems, invalid codes, duplicates and bad dates.
+      - name: cdc_ilinet_ga
+        description: CDC ILINet weekly outpatient influenza-like-illness rates for Georgia (via the Delphi Epidata API).

@@ -1,6 +1,7 @@
 # Runs the full pipeline and publishes the Evidence site to GitHub Pages.
 #
-#   generate -> load raw -> dbt build (models + tests) -> evidence build -> deploy
+#   generate (+ fetch CDC flu data) -> load raw -> dbt build (seeds, models, tests)
+#   -> export app data -> evidence build -> deploy
 #
 # A failing dbt test stops the run before anything is published.
 #
@@ -50,13 +51,23 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Generate source extracts
-        run: python projects/education_attendance/generate.py
+        run: |
+          python projects/education_attendance/generate.py
+          python projects/healthcare_diagnosis/generate.py
+
+      - name: Fetch CDC flu data (Georgia, ILINet)
+        run: python projects/healthcare_diagnosis/fetch_cdc_flu.py
 
       - name: Load raw layer
-        run: python pipeline/load_raw.py education_attendance
+        run: |
+          python pipeline/load_raw.py education_attendance
+          python pipeline/load_raw.py healthcare_diagnosis
 
       - name: dbt build (models + tests)
         run: python pipeline/run_dbt.py build --no-partial-parse
+
+      - name: Export data for the Diagnosis Explorer app
+        run: python pipeline/export_app_data.py
 
       - name: Install Evidence
         working-directory: evidence

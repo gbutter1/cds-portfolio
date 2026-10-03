@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnosis Explorer · Creative Data Solutions</title>
+<meta name="description" content="Pick a facility and month to see the top diagnoses, how they changed, and how flu activity compares with real CDC data for Georgia.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #DCE3EB;
+    --panel: #F7F9FC;
+    --line: #CBD6E3;
+    --grid: #E1E8F1;
+    --text-hi: #14213D;
+    --text-lo: #4E5C74;
+    --muted: #7A879C;
+    --value: #2D5FA8;
+    --value-soft: #D6E1F1;
+    --accent-cool: #1C3B6B;
+    --link: #1F6FB0;
+    --series-a: #1F6FB0;   /* facility / primary series */
+    --series-b: #D98A1E;   /* influenza highlight */
+    --series-c: #1E9E8A;   /* CDC (external) series */
+    --alert-wash: #F6DDD8;
+    --alert-ink: #9A2F1E;
+    --up: #9A2F1E;
+    --down: #1E7A4E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text-hi); font-family: 'Poppins', system-ui, sans-serif; }
+  a { color: var(--link); }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px 48px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px 40px; } }
+
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+            padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .topbar .brand { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: var(--accent-cool); text-decoration: none; font-size: 15px; }
+  .topbar nav a { color: var(--link); text-decoration: none; margin-left: 18px; font-weight: 500; }
+  .topbar nav a:first-child { margin-left: 0; }
+
+  header.hero { padding: 36px 0 20px; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--value); margin: 0 0 10px; }
+  h1 { font-weight: 600; font-size: 38px; line-height: 1.15; margin: 0 0 12px; max-width: 760px; }
+  h1 em { font-style: normal; color: var(--value); }
+  .lede { font-size: 16px; line-height: 1.65; color: var(--text-lo); max-width: 720px; margin: 0; }
+  @media (max-width: 600px) { h1 { font-size: 28px; } }
+
+  /* ---- controls ---- */
+  .controls { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 14px 0; margin: 8px 0 18px;
+              border-bottom: 1px solid var(--line); }
+  .controls-row { display: grid; grid-template-columns: 2fr 1.2fr 1fr 1.3fr 1.6fr; gap: 12px; }
+  @media (max-width: 960px) { .controls-row { grid-template-columns: 1fr 1fr; } .controls { position: static; } }
+  @media (max-width: 480px) { .controls-row { grid-template-columns: 1fr; } }
+  label.ctl { display: flex; flex-direction: column; gap: 5px; font-size: 12px; font-weight: 600; color: var(--text-lo); }
+  select { font: inherit; font-size: 14px; font-weight: 500; color: var(--text-hi); background: var(--panel);
+           border: 1px solid var(--line); border-radius: 8px; padding: 9px 34px 9px 11px; width: 100%;
+           appearance: none; -webkit-appearance: none; cursor: pointer;
+           background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%234E5C74' stroke-width='1.6'/%3E%3C/svg%3E");
+           background-repeat: no-repeat; background-position: right 12px center; }
+  select:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+
+  /* ---- tiles ---- */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+  @media (max-width: 860px) { .tiles { grid-template-columns: 1fr 1fr; } }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; min-width: 0; }
+  .tile .lbl { font-size: 12.5px; color: var(--text-lo); margin: 0 0 6px; }
+  .tile .val { font-size: 28px; font-weight: 600; line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
+  .tile .val.small { font-size: 17px; line-height: 1.35; }
+  .tile .sub { font-size: 12.5px; color: var(--text-lo); margin: 6px 0 0; }
+  .delta { font-weight: 600; }
+  .delta.up, .delta.down { color: var(--text-hi); }
+
+  /* ---- panels ---- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 960px) { .grid2 { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px 18px; margin-bottom: 18px; min-width: 0; }
+  @media (max-width: 600px) { .panel { padding: 16px 14px; } }
+  .panel h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px; color: var(--accent-cool); margin: 0 0 4px; }
+  .panel .note { font-size: 13px; color: var(--text-lo); margin: 0 0 14px; line-height: 1.5; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12.5px; color: var(--text-lo); margin: 0 0 10px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .ln { width: 16px; height: 0; border-top: 2px solid; display: inline-block; }
+  .ln.dash { border-top-style: dashed; }
+
+  /* ---- top-10 list ---- */
+  .rank { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .rank td { padding: 7px 4px; border-top: 1px solid var(--grid); vertical-align: middle; }
+  .rank tr:first-child td { border-top: 0; }
+  .rank .n { width: 26px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .rank .code { font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; white-space: nowrap; width: 82px; color: var(--accent-cool); }
+  .rank .desc { line-height: 1.35; }
+  .rank .desc small { display: block; color: var(--muted); font-size: 11.5px; }
+  .rank .barcell { width: 32%; }
+  .bar { position: relative; height: 16px; }
+  .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: var(--series-a); }
+  .bar i.flu { background: var(--series-b); }
+  .rank .num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; width: 64px; font-weight: 600; }
+  .rank .chg { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; width: 74px; font-size: 12.5px; }
+  .rank tr { cursor: default; }
+  .rank tr:hover td { background: #EEF3F9; }
+  @media (max-width: 600px) { .rank .barcell { display: none; } .rank .code { width: 70px; } }
+  .comparing .rank .barcell { display: none; }
+  .empty { color: var(--text-lo); font-size: 14px; padding: 18px 0; }
+
+  /* ---- charts ---- */
+  .chart { position: relative; width: 100%; }
+  .chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis text { font-size: 11px; fill: var(--muted); font-family: 'Poppins', sans-serif; }
+  .tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid var(--line); border-radius: 8px;
+         box-shadow: 0 6px 18px rgba(20,33,61,.12); padding: 8px 10px; font-size: 12.5px; color: var(--text-hi);
+         min-width: 170px; opacity: 0; transition: opacity .08s; z-index: 4; }
+  .tip .t { font-weight: 600; margin-bottom: 4px; }
+  .tip .r { display: flex; align-items: center; gap: 6px; color: var(--text-lo); white-space: nowrap; }
+  .tip .r b { color: var(--text-hi); font-weight: 600; margin-left: auto; padding-left: 10px; }
+  .alertchip { display: inline-flex; align-items: center; gap: 6px; background: var(--alert-wash); color: var(--alert-ink);
+               font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin: 0 0 10px; }
+  .okchip { display: inline-flex; align-items: center; gap: 6px; background: #DDEFE5; color: #1E5E3E;
+            font-size: 12.5px; font-weight: 600; padding: 4px 10px; border-radius: 12px; margin: 0 0 10px; }
+  .unavail { background: #FFF6E5; border: 1px solid #F0D9A8; color: #6B4A10; border-radius: 10px; padding: 12px 14px; font-size: 13.5px; }
+
+  .about { font-size: 14.5px; line-height: 1.7; color: var(--text-lo); }
+  .about h2 { margin-bottom: 10px; }
+  .about p { margin: 0 0 12px; }
+  .dq { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0 4px; }
+  .dq th, .dq td { text-align: left; padding: 6px 4px; border-top: 1px solid var(--grid); }
+  .dq th { color: var(--muted); font-weight: 500; border-top: 0; }
+  .dq td.r, .dq th.r { text-align: right; font-variant-numeric: tabular-nums; }
+  footer { border-top: 1px solid var(--line); margin-top: 28px; padding-top: 18px; font-size: 12.5px; color: var(--muted); text-align: center; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="brand" href="https://creativedatasolutions.tech/portfolio/">Creative Data Solutions · Portfolio</a>
+    <nav>
+      <a href="https://creativedatasolutions.tech/portfolio/">All projects</a>
+      <a href="../../healthcare-diagnosis/how-it-works">How it was built</a>
+      <a href="https://github.com/gbutter1/cds-portfolio">Source code</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <p class="eyebrow">Healthcare · Interactive app</p>
+    <h1>Diagnosis Explorer: <em>what are patients coming in for?</em></h1>
+    <p class="lede">Pick a facility and a month to see its most common diagnoses, how each one changed from the month before, and how that facility's flu season compares with real CDC flu data for Georgia.</p>
+  </header>
+
+  <div class="controls" role="region" aria-label="Filters">
+    <div class="controls-row">
+      <label class="ctl">Facility<select id="fFacility"></select></label>
+      <label class="ctl">Month<select id="fMonth"></select></label>
+      <label class="ctl">Age group<select id="fAge"></select></label>
+      <label class="ctl">Diagnosis category<select id="fCat"></select></label>
+      <label class="ctl">Compare with<select id="fCompare"></select></label>
+    </div>
+  </div>
+
+  <div id="loading" class="empty">Loading data…</div>
+  <main id="app" hidden>
+    <section class="tiles" aria-label="Summary">
+      <div class="tile"><p class="lbl">Visits this month</p><p class="val" id="tVisits">–</p><p class="sub" id="tVisitsSub"></p></div>
+      <div class="tile"><p class="lbl">Most common diagnosis</p><p class="val small" id="tTop">–</p><p class="sub" id="tTopSub"></p></div>
+      <div class="tile"><p class="lbl">Flu visits this month</p><p class="val" id="tFlu">–</p><p class="sub" id="tFluSub"></p></div>
+      <div class="tile"><p class="lbl">Fastest-rising diagnosis</p><p class="val small" id="tRise">–</p><p class="sub" id="tRiseSub"></p></div>
+    </section>
+
+    <div id="rankWrap" class="grid2">
+      <section class="panel" id="panelA">
+        <h2 id="rankTitleA">Top 10 diagnoses</h2>
+        <p class="note" id="rankNoteA"></p>
+        <div class="legend"><span><i class="sw" style="background:var(--series-a)"></i>Visits</span><span><i class="sw" style="background:var(--series-b)"></i>Influenza codes</span><span>▲▼ change vs prior month</span></div>
+        <table class="rank" id="rankA"></table>
+      </section>
+      <section class="panel" id="panelB" hidden>
+        <h2 id="rankTitleB">Comparison</h2>
+        <p class="note" id="rankNoteB"></p>
+        <div class="legend"><span><i class="sw" style="background:var(--series-a)"></i>Visits</span><span><i class="sw" style="background:var(--series-b)"></i>Influenza codes</span></div>
+        <table class="rank" id="rankB"></table>
+      </section>
+    </div>
+
+    <section class="panel">
+      <h2 id="fluTitle">Flu season</h2>
+      <p class="note" id="fluNote"></p>
+      <div id="fluStatus"></div>
+      <div class="legend"><span><i class="ln" style="border-color:var(--series-a)"></i>Flu share of visits (this facility)</span><span><i class="ln dash" style="border-color:var(--muted)"></i>Alert baseline</span><span><i class="sw" style="background:var(--alert-wash)"></i>Weeks above baseline</span><span><i class="sw" style="background:rgba(45,95,168,.18);outline:1px solid rgba(45,95,168,.45)"></i>Selected month</span></div>
+      <div class="chart" id="chartFlu"></div>
+      <h2 style="margin-top:18px">Georgia, real CDC data</h2>
+      <p class="note" id="cdcNote"></p>
+      <div class="chart" id="chartCdc"></div>
+    </section>
+
+    <section class="panel about">
+      <h2>About this app</h2>
+      <p><strong>What it shows.</strong> Visits from six fictional Atlanta-area facilities (an emergency department, an urgent care, a family practice, a pediatric practice, an internal medicine group and a community health center) across two flu seasons, October 2024 to September 2026. Each facility has its own patient mix, so the top diagnoses differ the way they would in real life: ear infections and checkups at pediatrics, chest and abdominal pain in the ER, high blood pressure and diabetes in internal medicine.</p>
+      <p><strong>What's real.</strong> The diagnosis codes and descriptions are the official ICD-10-CM code set, and the Georgia flu line is real surveillance data from the CDC's ILINet network, refreshed every time the pipeline runs. The individual visits are realistic sample data, so no patient information is involved.</p>
+      <p><strong>How the alert works.</strong> For each facility, the alert baseline is its normal off-season flu share (June to September) plus two standard deviations, with a minimum of 1% of visits. Any week above that line is flagged. This mirrors how the CDC defines a flu season's start and end.</p>
+      <p><strong>Data quality.</strong> Before anything reaches this page, the pipeline cleans and checks every visit. Codes typed without the dot or in lower case are corrected; records that can't be trusted are set aside and counted, never silently dropped:</p>
+      <table class="dq" id="dqTable"></table>
+      <p style="margin-top:12px"><a href="../../healthcare-diagnosis/how-it-works">See how it was built →</a></p>
+    </section>
+  </main>
+
+  <footer>© <span id="yr"></span> Creative Data Solutions · <span id="gen"></span></footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const fmt = new Intl.NumberFormat('en-US');
+  const pct = (x, d = 1) => (x == null || !isFinite(x)) ? '–' : (x * 100).toFixed(d) + '%';
+  const monthLabel = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const shortDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(n);
+    return n;
+  };
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  $('yr').textContent = new Date().getFullYear();
+
+  let D;               // data
+  let index;           // counts indexed by facility -> month -> [age][code]
+  const state = { fac: 'ALL', month: null, age: 'ALL', cat: 'ALL', cmp: 'NONE' };
+
+  fetch('data.json', { cache: 'no-cache' })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(init)
+    .catch((e) => { $('loading').textContent = 'Could not load data (' + e.message + '). Please refresh the page.'; });
+
+  function init(data) {
+    D = data;
+    const nF = D.facilities.length, nM = D.months.length, nA = D.age_groups.length, nC = D.codes.length;
+    // index[f][m][a][c] as a flat typed array for fast filtering
+    index = new Int32Array(nF * nM * nA * nC);
+    for (const [f, m, a, c, n] of D.counts) index[((f * nM + m) * nA + a) * nC + c] = n;
+    D._dims = { nF, nM, nA, nC };
+
+    const opt = (sel, value, text) => { const o = document.createElement('option'); o.value = value; o.textContent = text; sel.appendChild(o); };
+    opt($('fFacility'), 'ALL', 'All facilities');
+    D.facilities.forEach((f) => opt($('fFacility'), f.id, f.name));
+    D.months.forEach((m, i) => opt($('fMonth'), String(i), monthLabel(m)));
+    opt($('fAge'), 'ALL', 'All ages');
+    D.age_groups.forEach((a) => opt($('fAge'), a, a === '65+' ? '65 and over' : a + ' years'));
+    opt($('fCat'), 'ALL', 'All categories');
+    [...new Set(D.codes.map((c) => c.category))].sort().forEach((c) => opt($('fCat'), c, c));
+    opt($('fCompare'), 'NONE', 'No comparison');
+    opt($('fCompare'), 'ALL', 'All facilities');
+    D.facilities.forEach((f) => opt($('fCompare'), f.id, f.name));
+
+    // default: most recent January (peak flu) so the first view is interesting
+    let def = D.months.length - 1;
+    for (let i = D.months.length - 1; i >= 0; i--) if (D.months[i].slice(5, 7) === '01') { def = i; break; }
+    state.month = def;
+    $('fMonth').value = String(def);
+
+    ['fFacility', 'fMonth', 'fAge', 'fCat', 'fCompare'].forEach((id) => $(id).addEventListener('change', onChange));
+    $('gen').textContent = 'Data refreshed ' + new Date(D.generated_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    renderDQ();
+    $('loading').hidden = true; $('app').hidden = false;
+    render();
+    let t; window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(renderFlu, 120); });
+  }
+
+  function onChange() {
+    state.fac = $('fFacility').value;
+    state.month = +$('fMonth').value;
+    state.age = $('fAge').value;
+    state.cat = $('fCat').value;
+    state.cmp = $('fCompare').value;
+    render();
+  }
+
+  // totals per code for (facility, month) under the age & category filters
+  function codeCounts(fac, m) {
+    const { nF, nM, nA, nC } = D._dims;
+    const out = new Float64Array(nC);
+    if (m < 0) return out;
+    const fs = fac === 'ALL' ? [...Array(nF).keys()] : [D.facilities.findIndex((f) => f.id === fac)];
+    const as = state.age === 'ALL' ? [...Array(nA).keys()] : [D.age_groups.indexOf(state.age)];
+    for (const f of fs) for (const a of as) {
+      const base = ((f * nM + m) * nA + a) * nC;
+      for (let c = 0; c < nC; c++) out[c] += index[base + c];
+    }
+    if (state.cat !== 'ALL') for (let c = 0; c < nC; c++) if (D.codes[c].category !== state.cat) out[c] = 0;
+    return out;
+  }
+
+  function topList(fac) {
+    const cur = codeCounts(fac, state.month), prev = codeCounts(fac, state.month - 1);
+    const total = cur.reduce((s, x) => s + x, 0);
+    const rows = [];
+    cur.forEach((n, c) => { if (n > 0) rows.push({ c, n, prev: state.month > 0 ? prev[c] : null }); });
+    rows.sort((a, b) => b.n - a.n || D.codes[a.c].code.localeCompare(D.codes[b.c].code));
+    return { rows: rows.slice(0, 10), all: rows, total, prevTotal: prev.reduce((s, x) => s + x, 0) };
+  }
+
+  const facName = (id) => id === 'ALL' ? 'All facilities' : D.facilities.find((f) => f.id === id).name;
+  const scopeText = () => [state.age === 'ALL' ? 'all ages' : (state.age === '65+' ? 'ages 65+' : 'ages ' + state.age),
+                           state.cat === 'ALL' ? 'all diagnosis categories' : state.cat.toLowerCase()].join(', ');
+
+  function render() {
+    const A = topList(state.fac);
+    renderTiles(A);
+    renderRank($('rankA'), A, $('rankTitleA'), $('rankNoteA'), state.fac);
+    const showB = state.cmp !== 'NONE';
+    $('panelB').hidden = !showB;
+    $('rankWrap').style.gridTemplateColumns = showB ? '' : '1fr';
+    $('rankWrap').classList.toggle('comparing', showB);
+    if (showB) renderRank($('rankB'), topList(state.cmp), $('rankTitleB'), $('rankNoteB'), state.cmp);
+    renderFlu();
+  }
+
+  function deltaHTML(n, prev) {
+    if (prev == null || prev === 0) return '<span class="delta" style="color:var(--muted)">new</span>';
+    const d = (n - prev) / prev;
+    if (Math.abs(d) < 0.005) return '<span class="delta" style="color:var(--muted)">±0%</span>';
+    const up = d > 0;
+    return '<span class="delta ' + (up ? 'up' : 'down') + '">' + (up ? '▲ ' : '▼ ') + Math.abs(d * 100).toFixed(0) + '%</span>';
+  }
+
+  function renderTiles(A) {
+    const m = D.months[state.month];
+    $('tVisits').textContent = fmt.format(A.total);
+    $('tVisitsSub').innerHTML = state.month > 0 && A.prevTotal ? deltaHTML(A.total, A.prevTotal) + ' vs ' + monthLabel(D.months[state.month - 1]).split(' ')[0] : 'first month of data';
+    if (A.rows.length) {
+      const t = D.codes[A.rows[0].c];
+      $('tTop').textContent = t.code + ' · ' + shortDesc(t.description);
+      $('tTopSub').textContent = fmt.format(A.rows[0].n) + ' visits (' + pct(A.rows[0].n / A.total) + ')';
+    } else { $('tTop').textContent = '–'; $('tTopSub').textContent = 'No visits for this selection'; }
+    const fluN = A.all.filter((r) => D.codes[r.c].is_flu).reduce((s, r) => s + r.n, 0);
+    const fluP = A.all.filter((r) => D.codes[r.c].is_flu).reduce((s, r) => s + (r.prev || 0), 0);
+    $('tFlu').textContent = fmt.format(fluN);
+    $('tFluSub').innerHTML = A.total ? pct(fluN / A.total) + ' of visits' + (state.month > 0 && fluP ? ' · ' + deltaHTML(fluN, fluP) : '') : '';
+    // fastest rising among codes with meaningful volume
+    const cands = A.all.filter((r) => r.prev && r.prev >= 25 && r.n >= 40).map((r) => ({ ...r, d: (r.n - r.prev) / r.prev }));
+    cands.sort((a, b) => b.d - a.d);
+    if (cands.length && cands[0].d > 0) {
+      const t = D.codes[cands[0].c];
+      $('tRise').textContent = t.code + ' · ' + shortDesc(t.description);
+      $('tRiseSub').innerHTML = deltaHTML(cands[0].n, cands[0].prev) + ' · ' + fmt.format(cands[0].prev) + ' → ' + fmt.format(cands[0].n) + ' visits';
+    } else { $('tRise').textContent = 'Nothing rising'; $('tRiseSub').textContent = 'No diagnosis grew meaningfully this month'; }
+  }
+
+  function shortDesc(s) {
+    const cut = s.split(/,| due to | without | with /)[0];
+    return cut.length > 38 ? cut.slice(0, 36) + '…' : cut;
+  }
+
+  function renderRank(table, L, titleEl, noteEl, fac) {
+    titleEl.textContent = 'Top 10 diagnoses · ' + facName(fac);
+    noteEl.textContent = monthLabel(D.months[state.month]) + ' · ' + scopeText() + ' · ' + fmt.format(L.total) + ' visits';
+    table.textContent = '';
+    if (!L.rows.length) { const tr = table.insertRow(); const td = tr.insertCell(); td.className = 'empty'; td.textContent = 'No visits match this selection.'; return; }
+    const max = L.rows[0].n;
+    L.rows.forEach((r, i) => {
+      const code = D.codes[r.c];
+      const tr = table.insertRow();
+      tr.tabIndex = 0;
+      tr.title = code.code + ' ' + code.description + ': ' + fmt.format(r.n) + ' visits, ' + pct(r.n / L.total) + ' of visits';
+      const c0 = tr.insertCell(); c0.className = 'n'; c0.textContent = i + 1;
+      const c1 = tr.insertCell(); c1.className = 'code'; c1.textContent = code.code;
+      const c2 = tr.insertCell(); c2.className = 'desc'; c2.textContent = code.description;
+      const sm = document.createElement('small'); sm.textContent = code.category + ' · ' + pct(r.n / L.total) + ' of visits'; c2.appendChild(sm);
+      const c3 = tr.insertCell(); c3.className = 'barcell';
+      const bar = document.createElement('div'); bar.className = 'bar';
+      const fill = document.createElement('i'); if (code.is_flu) fill.className = 'flu';
+      fill.style.width = Math.max(2, (r.n / max) * 100) + '%'; bar.appendChild(fill); c3.appendChild(bar);
+      const c4 = tr.insertCell(); c4.className = 'num'; c4.textContent = fmt.format(r.n);
+      const c5 = tr.insertCell(); c5.className = 'chg'; c5.innerHTML = state.month > 0 ? deltaHTML(r.n, r.prev) : '';
+    });
+  }
+
+  // ---------------- flu charts ----------------
+  function seasonOf(iso) { const y = +iso.slice(0, 4), m = +iso.slice(5, 7); return m >= 10 ? y : y - 1; }
+
+  function renderFlu() {
+    const fac = state.fac;
+    const monthIso = D.months[state.month];
+    const season = seasonOf(monthIso);
+    const weeks = (D.flu_weekly[fac] || []).filter((w) => w[5] === season);
+    const base = D.flu_baseline[fac];
+    $('fluTitle').textContent = 'Flu season ' + season + '–' + String(season + 1).slice(2) + ' · ' + facName(fac);
+    $('fluNote').textContent = 'Share of each week\'s visits coded as influenza (J10/J11), all ages. The highlighted band is the month you picked.';
+    const alertWeeks = weeks.filter((w) => w[4]);
+    const inMonth = weeks.filter((w) => w[0].slice(0, 7) === monthIso.slice(0, 7));
+    const monthAlert = inMonth.some((w) => w[4]);
+    const st = $('fluStatus'); st.textContent = '';
+    const chip = document.createElement('span');
+    if (monthAlert) {
+      chip.className = 'alertchip';
+      chip.textContent = '⚠ Flu activity above baseline in ' + monthLabel(monthIso).split(' ')[0] + ' (' + alertWeeks.length + ' alert weeks this season)';
+    } else {
+      chip.className = 'okchip';
+      chip.textContent = '✓ Flu activity at normal levels in ' + monthLabel(monthIso).split(' ')[0] + (alertWeeks.length ? ' (' + alertWeeks.length + ' alert weeks this season, ' + shortDate(alertWeeks[0][0]) + ' to ' + shortDate(alertWeeks[alertWeeks.length - 1][0]) + ')' : '');
+    }
+    st.appendChild(chip);
+
+    const cdcWeeks = (D.cdc.weeks || []).filter((w) => seasonOf(addDays(w[0], 3)) === season);
+    const xDomain = weeks.map((w) => w[0]);
+    drawLine($('chartFlu'), {
+      xs: xDomain,
+      series: [{ key: 'Flu share of visits', color: css('--series-a'), values: weeks.map((w) => w[3]), extra: weeks.map((w) => fmt.format(w[2]) + ' of ' + fmt.format(w[1]) + ' visits') }],
+      baseline: base, alert: weeks.map((w) => w[4]), monthIso, height: 220,
+    });
+
+    if (!cdcWeeks.length) {
+      $('cdcNote').textContent = '';
+      const c = $('chartCdc'); c.textContent = '';
+      const d = document.createElement('div'); d.className = 'unavail';
+      d.textContent = 'CDC data was not available during the latest refresh. The comparison will return automatically on the next run.';
+      c.appendChild(d);
+      return;
+    }
+    $('cdcNote').textContent = 'Percent of outpatient visits for influenza-like illness at ' + (cdcWeeks[0][5] ? 'about ' + fmt.format(Math.round(avg(cdcWeeks.map((w) => w[5])))) + ' ' : '') + 'reporting providers in Georgia, by week. Source: ' + D.cdc.source + (D.cdc.latest_release ? ', released ' + new Date(D.cdc.latest_release + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '') + '. A different measure from the facility chart (symptoms, not confirmed diagnoses), so compare the timing and shape, not the height.';
+    const byWeek = new Map(cdcWeeks.map((w) => [w[0], w]));
+    drawLine($('chartCdc'), {
+      xs: xDomain,
+      series: [{ key: 'Georgia ILI', color: css('--series-c'), values: xDomain.map((x) => byWeek.has(x) ? byWeek.get(x)[2] : null), extra: xDomain.map((x) => byWeek.has(x) ? fmt.format(byWeek.get(x)[3]) + ' ILI visits statewide' : 'no CDC report') }],
+      monthIso, height: 170,
+    });
+  }
+
+  const avg = (a) => a.reduce((s, x) => s + x, 0) / (a.length || 1);
+  function addDays(iso, n) { const d = new Date(iso + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+
+  function niceMax(v) {
+    if (!(v > 0)) return 0.01;
+    const steps = [0.005, 0.01, 0.02, 0.025, 0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5];
+    for (const s of steps) if (v <= s) return s;
+    return Math.ceil(v * 10) / 10;
+  }
+
+  function drawLine(container, { xs, series, baseline, alert, monthIso, height }) {
+    container.textContent = '';
+    const W = Math.max(320, container.clientWidth || 800), H = height;
+    const m = { t: 10, r: 14, b: 26, l: 46 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const svg = el('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': series[0].key + ' by week' }, container);
+    const n = xs.length;
+    if (!n) return;
+    const x = (i) => m.l + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
+    const step = n > 1 ? iw / (n - 1) : iw;
+    const vmax = niceMax(Math.max(baseline || 0, ...series.flatMap((s) => s.values.filter((v) => v != null))) * 1.08);
+    const y = (v) => m.t + ih - (v / vmax) * ih;
+
+    // alert weeks, then the selected-month band on top so both stay visible
+    if (alert) alert.forEach((a, i) => { if (a) el('rect', { x: x(i) - step / 2, y: m.t, width: step, height: ih, fill: css('--alert-wash'), opacity: 0.85 }, svg); });
+    const mi = xs.map((d, i) => [d, i]).filter(([d]) => d.slice(0, 7) === monthIso.slice(0, 7)).map(([, i]) => i);
+    if (mi.length) {
+      const bx = x(mi[0]) - step / 2, bw = (mi[mi.length - 1] - mi[0] + 1) * step;
+      el('rect', { x: bx, y: m.t, width: bw, height: ih, fill: css('--value'), opacity: 0.13 }, svg);
+      el('line', { x1: bx, x2: bx, y1: m.t, y2: m.t + ih, stroke: css('--value'), 'stroke-width': 1, opacity: 0.45 }, svg);
+      el('line', { x1: bx + bw, x2: bx + bw, y1: m.t, y2: m.t + ih, stroke: css('--value'), 'stroke-width': 1, opacity: 0.45 }, svg);
+    }
+
+    // grid + y axis
+    const g = el('g', { class: 'axis' }, svg);
+    const ticks = 4;
+    for (let k = 0; k <= ticks; k++) {
+      const v = (vmax / ticks) * k, yy = y(v);
+      el('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: css('--grid'), 'stroke-width': 1 }, g);
+      const t = el('text', { x: m.l - 8, y: yy + 4, 'text-anchor': 'end' }, g); t.textContent = (+(v * 100).toFixed(1)).toString() + '%';
+    }
+    // x axis: first week of each month
+    let lastM = '';
+    xs.forEach((d, i) => {
+      const mo = d.slice(0, 7);
+      const wed = addDays(d, 3).slice(0, 7);
+      if (wed !== lastM) {
+        lastM = wed;
+        const t = el('text', { x: x(i), y: H - 6, 'text-anchor': 'middle' }, g);
+        t.textContent = new Date(wed + '-01T00:00:00').toLocaleDateString('en-US', { month: 'short' });
+        if (W < 520 && (new Date(wed + '-01T00:00:00').getMonth() % 2)) t.textContent = '';
+      }
+    });
+
+    // baseline
+    if (baseline != null) {
+      el('line', { x1: m.l, x2: W - m.r, y1: y(baseline), y2: y(baseline), stroke: css('--muted'), 'stroke-width': 1.5, 'stroke-dasharray': '5 4' }, svg);
+      const t = el('text', { x: W - m.r, y: y(baseline) - 5, 'text-anchor': 'end', fill: css('--text-lo'), 'font-size': 11 }, svg);
+      t.textContent = 'baseline ' + pct(baseline);
+    }
+
+    // lines
+    series.forEach((s) => {
+      let d = '', pen = false;
+      s.values.forEach((v, i) => {
+        if (v == null) { pen = false; return; }
+        d += (pen ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); pen = true;
+      });
+      el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+      // peak label
+      let pi = -1; s.values.forEach((v, i) => { if (v != null && (pi < 0 || v > s.values[pi])) pi = i; });
+      if (pi >= 0) {
+        el('circle', { cx: x(pi), cy: y(s.values[pi]), r: 4, fill: s.color, stroke: css('--panel'), 'stroke-width': 2 }, svg);
+        const lx = Math.min(Math.max(x(pi), m.l + 40), W - m.r - 40);
+        const t = el('text', { x: lx, y: y(s.values[pi]) - 9, 'text-anchor': 'middle', fill: css('--text-hi'), 'font-size': 11.5, 'font-weight': 600 }, svg);
+        t.textContent = 'peak ' + pct(s.values[pi]) + ' · ' + shortDate(xs[pi]);
+      }
+    });
+
+    // crosshair + tooltip
+    const hair = el('line', { y1: m.t, y2: m.t + ih, stroke: css('--text-lo'), 'stroke-width': 1, opacity: 0 }, svg);
+    const dots = series.map((s) => el('circle', { r: 4, fill: s.color, stroke: css('--panel'), 'stroke-width': 2, opacity: 0 }, svg));
+    const tip = document.createElement('div'); tip.className = 'tip'; container.appendChild(tip);
+    const hit = el('rect', { x: m.l - step / 2, y: m.t, width: iw + step, height: ih, fill: 'transparent' }, svg);
+    hit.style.cursor = 'crosshair';
+    const show = (i) => {
+      hair.setAttribute('x1', x(i)); hair.setAttribute('x2', x(i)); hair.setAttribute('opacity', 0.5);
+      tip.textContent = '';
+      const tt = document.createElement('div'); tt.className = 't'; tt.textContent = 'Week of ' + shortDate(xs[i]) + (alert && alert[i] ? ' · above baseline' : ''); tip.appendChild(tt);
+      series.forEach((s, k) => {
+        const v = s.values[i];
+        dots[k].setAttribute('opacity', v == null ? 0 : 1);
+        if (v != null) { dots[k].setAttribute('cx', x(i)); dots[k].setAttribute('cy', y(v)); }
+        const r = document.createElement('div'); r.className = 'r';
+        const key = document.createElement('i'); key.className = 'ln'; key.style.borderColor = s.color; r.appendChild(key);
+        r.appendChild(document.createTextNode(s.key));
+        const b = document.createElement('b'); b.textContent = v == null ? '–' : pct(v, 2); r.appendChild(b);
+        tip.appendChild(r);
+        if (s.extra) { const e = document.createElement('div'); e.className = 'r'; e.style.paddingLeft = '22px'; e.textContent = s.extra[i]; tip.appendChild(e); }
+      });
+      const scale = container.clientWidth / W;
+      let left = x(i) * scale + 12; if (left + 220 > container.clientWidth) left = x(i) * scale - 232;
+      tip.style.left = Math.max(0, left) + 'px'; tip.style.top = '6px'; tip.style.opacity = 1;
+    };
+    const hide = () => { hair.setAttribute('opacity', 0); dots.forEach((d) => d.setAttribute('opacity', 0)); tip.style.opacity = 0; };
+    const idxAt = (evt) => {
+      const r = svg.getBoundingClientRect();
+      const px = (evt.clientX - r.left) * (W / r.width);
+      return Math.max(0, Math.min(n - 1, Math.round(((px - m.l) / iw) * (n - 1))));
+    };
+    hit.addEventListener('pointermove', (e) => show(idxAt(e)));
+    hit.addEventListener('pointerleave', hide);
+    svg.setAttribute('tabindex', '0');
+    let kb = -1;
+    svg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { kb = Math.max(0, Math.min(n - 1, (kb < 0 ? 0 : kb) + (e.key === 'ArrowRight' ? 1 : -1))); show(kb); e.preventDefault(); }
+    });
+    svg.addEventListener('blur', hide);
+  }
+
+  function renderDQ() {
+    const t = $('dqTable'); t.textContent = '';
+    const h = t.createTHead().insertRow();
+    [['Result', ''], ['Rows', 'r'], ['Share', 'r']].forEach(([s, c]) => { const th = document.createElement('th'); th.textContent = s; if (c) th.className = c; h.appendChild(th); });
+    const b = t.createTBody();
+    let normalized = 0;
+    D.data_quality.forEach((r) => {
+      normalized += r.normalized;
+      const tr = b.insertRow();
+      tr.insertCell().textContent = r.description;
+      const c1 = tr.insertCell(); c1.className = 'r'; c1.textContent = fmt.format(r.rows);
+      const c2 = tr.insertCell(); c2.className = 'r'; c2.textContent = r.pct.toFixed(2) + '%';
+    });
+    const tr = b.insertRow();
+    tr.insertCell().textContent = 'Codes corrected (format only) and kept';
+    const c1 = tr.insertCell(); c1.className = 'r'; c1.textContent = fmt.format(normalized);
+    tr.insertCell();
+  }
+})();
+</script>
+</body>
+</html>
