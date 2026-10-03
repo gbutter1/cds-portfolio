@@ -1,15 +1,15 @@
 ---
-title: How It Was Built · Diagnosis Explorer
+title: How It Was Built · Diagnosis & Flu Explorer
 ---
 
-The Diagnosis Explorer is an interactive app:
+The Diagnosis & Flu Explorer is an interactive app:
 a visitor picks a facility, month, age group and diagnosis category, and gets
 that facility's top diagnoses, month-over-month changes and a flu-season view
 compared with real CDC data. Behind it is the same tested pipeline as every
 project in this portfolio. The full source is in the
 [public repository on GitHub](https://github.com/gbutter1/cds-portfolio).
 
-<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis Explorer →</LinkButton>
+<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis & Flu Explorer →</LinkButton>
 
 ## 1. Sources
 
@@ -97,4 +97,4 @@ needs no server, and costs nothing to host. Charts are hand-built SVG with
 hover and keyboard tooltips; the color palette was checked for
 colorblind-safe separation.
 
-<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis Explorer →</LinkButton>
+<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis & Flu Explorer →</LinkButton>

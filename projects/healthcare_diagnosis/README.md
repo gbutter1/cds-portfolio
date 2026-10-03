@@ -1,4 +1,4 @@
-# Diagnosis Explorer
+# Diagnosis & Flu Explorer
 
 **Sector:** Healthcare (outpatient and emergency care)
 **Question answered:** For a given facility, month and patient age group,

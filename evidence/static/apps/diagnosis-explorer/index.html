@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Diagnosis Explorer · Creative Data Solutions</title>
+<title>Diagnosis &amp; Flu Explorer · Creative Data Solutions</title>
 <meta name="description" content="Pick a facility and month to see the top diagnoses, how they changed, and how flu activity compares with real CDC data for Georgia.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
@@ -69,6 +69,7 @@
   .tile .val { font-size: 28px; font-weight: 600; line-height: 1.15; margin: 0; overflow-wrap: anywhere; }
   .tile .val.small { font-size: 17px; line-height: 1.35; }
   .tile .sub { font-size: 12.5px; color: var(--text-lo); margin: 6px 0 0; }
+  .tile .sub .allcats { display: block; margin-top: 3px; font-style: italic; }
   .delta { font-weight: 600; }
   .delta.up, .delta.down { color: var(--text-hi); }
 
@@ -145,7 +146,7 @@
 
   <header class="hero">
     <p class="eyebrow">Healthcare · Interactive app</p>
-    <h1>Diagnosis Explorer: <em>what are patients coming in for?</em></h1>
+    <h1>Diagnosis &amp; Flu Explorer: <em>what are patients coming in for, and is flu rising?</em></h1>
     <p class="lede">Pick a facility and a month to see its most common diagnoses, how each one changed from the month before, and how that facility's flu season compares with real CDC flu data for Georgia.</p>
   </header>
 
@@ -279,7 +280,7 @@
   }
 
   // totals per code for (facility, month) under the age & category filters
-  function codeCounts(fac, m) {
+  function codeCounts(fac, m, allCats) {
     const { nF, nM, nA, nC } = D._dims;
     const out = new Float64Array(nC);
     if (m < 0) return out;
@@ -289,7 +290,7 @@
       const base = ((f * nM + m) * nA + a) * nC;
       for (let c = 0; c < nC; c++) out[c] += index[base + c];
     }
-    if (state.cat !== 'ALL') for (let c = 0; c < nC; c++) if (D.codes[c].category !== state.cat) out[c] = 0;
+    if (!allCats && state.cat !== 'ALL') for (let c = 0; c < nC; c++) if (D.codes[c].category !== state.cat) out[c] = 0;
     return out;
   }
 
@@ -335,10 +336,17 @@
       $('tTop').textContent = t.code + ' · ' + shortDesc(t.description);
       $('tTopSub').textContent = fmt.format(A.rows[0].n) + ' visits (' + pct(A.rows[0].n / A.total) + ')';
     } else { $('tTop').textContent = '–'; $('tTopSub').textContent = 'No visits for this selection'; }
-    const fluN = A.all.filter((r) => D.codes[r.c].is_flu).reduce((s, r) => s + r.n, 0);
-    const fluP = A.all.filter((r) => D.codes[r.c].is_flu).reduce((s, r) => s + (r.prev || 0), 0);
+    // Flu tile ignores the category filter: a card titled "Flu visits" should never read 0
+    // just because a non-respiratory category is selected.
+    const fluSum = (arr) => arr.reduce((s, n, c) => s + (D.codes[c].is_flu ? n : 0), 0);
+    const curAll = codeCounts(state.fac, state.month, true);
+    const totAll = curAll.reduce((s, x) => s + x, 0);
+    const fluN = fluSum(curAll);
+    const fluP = state.month > 0 ? fluSum(codeCounts(state.fac, state.month - 1, true)) : 0;
+    const catHidesFlu = state.cat !== 'ALL' && !D.codes.some((c) => c.is_flu && c.category === state.cat);
     $('tFlu').textContent = fmt.format(fluN);
-    $('tFluSub').innerHTML = A.total ? pct(fluN / A.total) + ' of visits' + (state.month > 0 && fluP ? ' · ' + deltaHTML(fluN, fluP) : '') : '';
+    $('tFluSub').innerHTML = totAll ? pct(fluN / totAll) + ' of visits' + (state.month > 0 && fluP ? ' · ' + deltaHTML(fluN, fluP) : '') : '';
+    if (catHidesFlu) { const n = document.createElement('span'); n.className = 'allcats'; n.textContent = 'Includes all categories'; $('tFluSub').appendChild(n); }
     // fastest rising among codes with meaningful volume
     const cands = A.all.filter((r) => r.prev && r.prev >= 25 && r.n >= 40).map((r) => ({ ...r, d: (r.n - r.prev) / r.prev }));
     cands.sort((a, b) => b.d - a.d);
@@ -463,7 +471,9 @@
 
     // grid + y axis
     const g = el('g', { class: 'axis' }, svg);
-    const ticks = 4;
+    // pick a tick count that lands on round percentages (0, 5, 10, 15% rather than 3.8, 7.5, 11.2%)
+    const nice = [0.1, 0.2, 0.25, 0.5, 1, 2, 2.5, 5, 10, 20];
+    const ticks = [5, 4, 3].find((t) => nice.some((s) => Math.abs(vmax * 100 / t - s) < 1e-9)) || 4;
     for (let k = 0; k <= ticks; k++) {
       const v = (vmax / ticks) * k, yy = y(v);
       el('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: css('--grid'), 'stroke-width': 1 }, g);

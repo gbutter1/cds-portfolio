@@ -13,7 +13,7 @@ live in this repository.
 | Project | Sector | What it shows |
 |---|---|---|
 | [K-12 Daily Attendance & Chronic Absenteeism](projects/education_attendance/) | Education | Messy daily-attendance extract → validated student/school/month models → attendance and chronic-absenteeism dashboards, with a data-quality report of every rejected row |
-| [Diagnosis Explorer](projects/healthcare_diagnosis/) ([open the app](https://gbutter1.github.io/cds-portfolio/apps/diagnosis-explorer/)) | Healthcare | Interactive app: pick a facility, month and age group to see its top diagnosis codes and flu-season trend, compared with real CDC flu surveillance data for Georgia |
+| [Diagnosis & Flu Explorer](projects/healthcare_diagnosis/) ([open the app](https://gbutter1.github.io/cds-portfolio/apps/diagnosis-explorer/)) | Healthcare | Interactive app: pick a facility, month and age group to see its top diagnosis codes and flu-season trend, compared with real CDC flu surveillance data for Georgia |
 
 More projects are added here as they are completed. Each follows the same shape.
 
@@ -76,6 +76,6 @@ python pipeline/run_evidence.py dev
 No client, student or patient data appears anywhere in this repository.
 Datasets are generated from a fixed random seed with realistic structure,
 seasonality and error patterns so the engineering can be shown in full.
-The one exception is the CDC flu comparison in the Diagnosis Explorer, which
+The one exception is the CDC flu comparison in the Diagnosis & Flu Explorer, which
 uses real, public CDC ILINet surveillance data for Georgia (state-level
 weekly totals, no individual records).

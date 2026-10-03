@@ -66,7 +66,7 @@ jobs:
       - name: dbt build (models + tests)
         run: python pipeline/run_dbt.py build --no-partial-parse
 
-      - name: Export data for the Diagnosis Explorer app
+      - name: Export data for the Diagnosis & Flu Explorer app
         run: python pipeline/export_app_data.py
 
       - name: Install Evidence

@@ -45,7 +45,7 @@ are all present and all caught.
 <LinkButton url="/education-attendance/data-quality">Data quality report</LinkButton>
 <LinkButton url="/education-attendance/how-it-works">How it was built</LinkButton>
 
-### Healthcare Diagnosis Explorer (interactive app)
+### Healthcare Diagnosis & Flu Explorer (interactive app)
 
 An app rather than a dashboard: pick a facility, month, age group and
 diagnosis category, and get that facility's top 10 diagnoses (real ICD-10
@@ -55,7 +55,7 @@ for Georgia** pulled fresh on every run. Six fictional facilities, two flu
 seasons, ~235,000 visits, with messy codes cleaned and every rejected record
 counted.
 
-<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis Explorer →</LinkButton>
+<LinkButton url="/apps/diagnosis-explorer/index.html">Open the Diagnosis & Flu Explorer →</LinkButton>
 <LinkButton url="/healthcare-diagnosis/how-it-works">How it was built</LinkButton>
 
 *More projects are added to this same repository as they are completed.*

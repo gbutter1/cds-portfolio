@@ -1,5 +1,5 @@
 """
-Export the healthcare marts to a compact JSON file for the Diagnosis Explorer
+Export the healthcare marts to a compact JSON file for the Diagnosis & Flu Explorer
 app, which runs entirely in the browser (no server, no database connection).
 
 Reads:  marts.hc_* tables and reference.icd10_reference (built by dbt)
